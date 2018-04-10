@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -14,41 +13,32 @@ import com.muzi.library.MenuOrientation;
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+
 public class MainActivity extends AppCompatActivity {
 
-    private Button btnInit, btnOpen, btnClose;
-    private AroundMenu aroundMenu;
+    @BindView(R.id.btnOri)
+    Button btnOri;
+    @BindView(R.id.btnNum)
+    Button btnNum;
+    @BindView(R.id.menu)
+    AroundMenu aroundMenu;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        btnInit = findViewById(R.id.btnInit);
-        btnOpen = findViewById(R.id.btnOpen);
-        btnClose = findViewById(R.id.btnClose);
-        aroundMenu = findViewById(R.id.menu);
+        ButterKnife.bind(this);
 
-        btnInit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                init();
-            }
-        });
-        btnOpen.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                aroundMenu.setMenuOrientation(MenuOrientation.BOTTOM);
-            }
-        });
-        btnClose.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-//                aroundMenu.closeMenu();
-//                aroundMenu.setMenuCenterSize(120);
-
-                aroundMenu.setCentBtnView(LayoutInflater.from(MainActivity.this).inflate(R.layout.item_btn, null, false));
-            }
-        });
+        List<View> list = new ArrayList<>();
+        list.add(LayoutInflater.from(this).inflate(R.layout.item_btn, null, false));
+        list.add(LayoutInflater.from(this).inflate(R.layout.item_btn, null, false));
+        list.add(LayoutInflater.from(this).inflate(R.layout.item_btn, null, false));
+        list.add(LayoutInflater.from(this).inflate(R.layout.item_btn, null, false));
+        aroundMenu.setMenuViewList(list);
+        aroundMenu.setCentBtnView(LayoutInflater.from(MainActivity.this).inflate(R.layout.item_btn, null, false));
 
         aroundMenu.setMenuClick(new AroundMenu.OnAroundMenuClick() {
             @Override
@@ -61,10 +51,6 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(MainActivity.this, "position:" + position, Toast.LENGTH_SHORT).show();
             }
         });
-
-        ViewGroup.MarginLayoutParams layoutParams = (ViewGroup.MarginLayoutParams) btnClose.getLayoutParams();
-        layoutParams.bottomMargin = 10;
-        btnClose.setLayoutParams(layoutParams);
     }
 
     private void init() {
@@ -74,6 +60,19 @@ public class MainActivity extends AppCompatActivity {
         list.add(LayoutInflater.from(this).inflate(R.layout.item_btn, null, false));
         list.add(LayoutInflater.from(this).inflate(R.layout.item_btn, null, false));
         list.add(LayoutInflater.from(this).inflate(R.layout.item_btn, null, false));
-        aroundMenu.setMenuList(list);
+        aroundMenu.setMenuViewList(list);
+        aroundMenu.setCentBtnView(LayoutInflater.from(MainActivity.this).inflate(R.layout.item_btn, null, false));
+    }
+
+    @OnClick({R.id.btnOri, R.id.btnNum})
+    public void onViewClicked(View view) {
+        switch (view.getId()) {
+            case R.id.btnOri:
+                aroundMenu.setMenuOrientation(MenuOrientation.RIGHT_BOTTOM);
+                break;
+            case R.id.btnNum:
+                init();
+                break;
+        }
     }
 }

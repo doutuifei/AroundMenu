@@ -8,27 +8,23 @@
     tools:context=".MainActivity">
 
     <Button
-        android:id="@+id/btnInit"
+        android:id="@+id/btnOri"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="初始化" />
+        android:text="更改方向" />
 
     <Button
-        android:id="@+id/btnOpen"
+        android:id="@+id/btnNum"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="打开" />
-
-    <Button
-        android:id="@+id/btnClose"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="关闭" />
+        android:text="更改数量" />
 
     <com.muzi.library.AroundMenu
         android:id="@+id/menu"
-        android:layout_width="300dp"
-        android:layout_height="300dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:menuOrientation="bottom"
+        app:centerBtnColor="@color/colorPrimaryDark"
         android:background="@color/colorAccent"></com.muzi.library.AroundMenu>
 
 </LinearLayout>

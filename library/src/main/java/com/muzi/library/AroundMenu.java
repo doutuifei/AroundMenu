@@ -71,21 +71,21 @@ public class AroundMenu<T extends View> extends FrameLayout implements View.OnCl
      *
      * @param childSize
      */
-    public void setMenuCenterSize(int childSize) {
-        this.childWidth = childSize;
-        View view = getChildAt(0);
-        if (view instanceof MenuButton && view != null) {
-            ((MenuButton) view).setSize(childSize);
-            requestLayout();
-        }
-    }
+//    public void setMenuCenterSize(int childSize) {
+//        this.childWidth = childSize;
+//        View view = getChildAt(0);
+//        if (view instanceof MenuButton && view != null) {
+//            ((MenuButton) view).setSize(childSize);
+//            requestLayout();
+//        }
+//    }
 
     /**
      * 添加菜单按钮
      *
      * @param buttonList
      */
-    public void setMenuList(List<T> buttonList) {
+    public void setMenuViewList(List<T> buttonList) {
         this.buttonList = buttonList;
         initView();
     }
