@@ -3,8 +3,6 @@ package com.muzi.library;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.support.annotation.Nullable;
-import android.util.AttributeSet;
 import android.view.View;
 
 /**
@@ -29,19 +27,15 @@ public class MenuButton extends View {
     }
 
     public MenuButton(Context context, int size, int color) {
-        this(context, null);
+        super(context);
         this.size = size;
         this.color = color;
-    }
-
-    public MenuButton(Context context, @Nullable AttributeSet attrs) {
-        super(context, attrs);
-
         paint = new Paint();
         paint.setAntiAlias(true);
         paint.setColor(color);
         paint.setStyle(Paint.Style.FILL);
     }
+
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
@@ -51,14 +45,18 @@ public class MenuButton extends View {
         widthMeasure = MeasureSpec.getSize(widthMeasureSpec);
         widthMode = MeasureSpec.getMode(widthMeasureSpec);
 
-        if (widthMode == MeasureSpec.AT_MOST) {
+        if (widthMode == MeasureSpec.EXACTLY) {
+            widthMeasure = widthMeasure > DefalutConfig.MAX_SIZE ? DefalutConfig.MAX_SIZE : widthMeasure;
+        } else if (widthMode == MeasureSpec.AT_MOST) {
             widthMeasure = size;
         }
 
         heightMeasure = MeasureSpec.getSize(heightMeasureSpec);
         heightMode = MeasureSpec.getMode(heightMeasureSpec);
 
-        if (heightMode == MeasureSpec.AT_MOST) {
+        if (heightMode == MeasureSpec.EXACTLY) {
+            heightMeasure = heightMeasure > DefalutConfig.MAX_SIZE ? DefalutConfig.MAX_SIZE : heightMeasure;
+        } else if (heightMode == MeasureSpec.AT_MOST) {
             heightMeasure = size;
         }
 

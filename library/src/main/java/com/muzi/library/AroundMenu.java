@@ -8,7 +8,9 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Rect;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.animation.OvershootInterpolator;
 import android.widget.FrameLayout;
 
@@ -25,7 +27,7 @@ public class AroundMenu<T extends View> extends FrameLayout implements View.OnCl
 
     private int count;//数量
 
-    private int radius = 400;//半径
+    private int menuWidth = 500;//半径
 
     private int childWidth;//按钮的宽度
 
@@ -38,6 +40,8 @@ public class AroundMenu<T extends View> extends FrameLayout implements View.OnCl
 
     private int centerBtnSize;//中间按钮大小
 
+    private int screenWidth, screenHeight;
+
     public AroundMenu(Context context) {
         this(context, null);
     }
@@ -47,11 +51,16 @@ public class AroundMenu<T extends View> extends FrameLayout implements View.OnCl
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.AroundMenu);
         menuOrientation = typedArray.getInt(R.styleable.AroundMenu_menuOrientation, MenuOrientation.TOP);
         centerBtnColor = typedArray.getColor(R.styleable.AroundMenu_centerBtnColor, DefalutConfig.DEFAULT_COLOR);
-        centerBtnSize = (int) typedArray.getDimension(R.styleable.AroundMenu_menuSize, DefalutConfig.MIN_SIZE);
+        centerBtnSize = (int) typedArray.getDimension(R.styleable.AroundMenu_menuBtnSize, DefalutConfig.MIN_SIZE);
         typedArray.recycle();
 
         //默认添加中间按钮
         addCenterBtn();
+        WindowManager manager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        DisplayMetrics metrics = new DisplayMetrics();
+        manager.getDefaultDisplay().getMetrics(metrics);
+        screenWidth = metrics.widthPixels;
+        screenHeight = metrics.heightPixels;
     }
 
     /**
@@ -143,8 +152,7 @@ public class AroundMenu<T extends View> extends FrameLayout implements View.OnCl
      * 添加中间按钮
      */
     private void addCenterBtn() {
-//        MenuButton centerButton = new MenuButton(getContext(), centerBtnSize, centerBtnColor);
-        MenuButton centerButton = new MenuButton(getContext());
+        MenuButton centerButton = new MenuButton(getContext(), centerBtnSize, centerBtnColor);
         centerButton.setId(-1);
         centerButton.setOnClickListener(this);
         addView(centerButton);
@@ -161,19 +169,19 @@ public class AroundMenu<T extends View> extends FrameLayout implements View.OnCl
         widthMode = MeasureSpec.getMode(widthMeasureSpec);
 
         if (widthMode == MeasureSpec.AT_MOST) {
-            widthSize = radius;
+            widthSize = menuWidth;
         }
 
         heightSize = MeasureSpec.getSize(heightMeasureSpec);
         heightMode = MeasureSpec.getMode(heightMeasureSpec);
 
         if (heightMode == MeasureSpec.AT_MOST) {
-            heightSize = radius;
+            heightSize = menuWidth;
         }
 
-        radius = widthSize > heightSize ? heightSize : widthSize;
+        menuWidth = widthSize > heightSize ? heightSize : widthSize;
 
-        setMeasuredDimension(widthSize, heightSize);
+        setMeasuredDimension(menuWidth, menuWidth);
     }
 
 
@@ -189,7 +197,7 @@ public class AroundMenu<T extends View> extends FrameLayout implements View.OnCl
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         super.onLayout(changed, left, top, right, bottom);
-        Rect rect = AroundMenuHelp.calculateLayout(menuOrientation, radius, childWidth);
+        Rect rect = AroundMenuHelp.calculateLayout(menuOrientation, menuWidth, childWidth);
         if (count > 0) {
             for (int i = 1; i <= count; i++) {
                 View view = getChildAt(i);
@@ -237,7 +245,7 @@ public class AroundMenu<T extends View> extends FrameLayout implements View.OnCl
         for (int i = 0; i <= count; i++) {
             View view = getChildAt(i + 1);
             if (view != null) {
-                openAnimator(view, i, count, radius - childWidth);
+                openAnimator(view, i, count, menuWidth - childWidth);
             }
         }
         if (onAroundMenuClick != null) {
@@ -256,7 +264,7 @@ public class AroundMenu<T extends View> extends FrameLayout implements View.OnCl
         for (int i = 0; i <= count; i++) {
             View view = getChildAt(i + 1);
             if (view != null) {
-                closeAnimator(view, i, count, radius - childWidth);
+                closeAnimator(view, i, count, menuWidth - childWidth);
             }
         }
         if (onAroundMenuClick != null) {
