@@ -8,9 +8,7 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Rect;
 import android.util.AttributeSet;
-import android.util.DisplayMetrics;
 import android.view.View;
-import android.view.WindowManager;
 import android.view.animation.OvershootInterpolator;
 import android.widget.FrameLayout;
 
@@ -27,7 +25,7 @@ public class AroundMenu<T extends View> extends FrameLayout implements View.OnCl
 
     private int count;//数量
 
-    private int menuWidth = 500;//半径
+    private int menuWidth = 400;//半径
 
     private int childWidth;//按钮的宽度
 
@@ -40,7 +38,7 @@ public class AroundMenu<T extends View> extends FrameLayout implements View.OnCl
 
     private int centerBtnSize;//中间按钮大小
 
-    private int screenWidth, screenHeight;
+    private View centerView;//中间按钮
 
     public AroundMenu(Context context) {
         this(context, null);
@@ -50,17 +48,12 @@ public class AroundMenu<T extends View> extends FrameLayout implements View.OnCl
         super(context, attrs);
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.AroundMenu);
         menuOrientation = typedArray.getInt(R.styleable.AroundMenu_menuOrientation, MenuOrientation.TOP);
-        centerBtnColor = typedArray.getColor(R.styleable.AroundMenu_centerBtnColor, DefalutConfig.DEFAULT_COLOR);
-        centerBtnSize = (int) typedArray.getDimension(R.styleable.AroundMenu_menuBtnSize, DefalutConfig.MIN_SIZE);
+        centerBtnColor = typedArray.getColor(R.styleable.AroundMenu_centerBtnColor, MenuConfig.DEFAULT_COLOR);
+        centerBtnSize = (int) typedArray.getDimension(R.styleable.AroundMenu_menuBtnSize, MenuConfig.MIN_SIZE);
         typedArray.recycle();
 
         //默认添加中间按钮
         addCenterBtn();
-        WindowManager manager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-        DisplayMetrics metrics = new DisplayMetrics();
-        manager.getDefaultDisplay().getMetrics(metrics);
-        screenWidth = metrics.widthPixels;
-        screenHeight = metrics.heightPixels;
     }
 
     /**
@@ -80,9 +73,9 @@ public class AroundMenu<T extends View> extends FrameLayout implements View.OnCl
      */
     public void setMenuCenterSize(int childSize) {
         this.childWidth = childSize;
-        MenuButton menuButton = (MenuButton) getChildAt(0);
-        if (menuButton != null) {
-            menuButton.setSize(childSize);
+        View view = getChildAt(0);
+        if (view instanceof MenuButton && view != null) {
+            ((MenuButton) view).setSize(childSize);
             requestLayout();
         }
     }
@@ -94,11 +87,12 @@ public class AroundMenu<T extends View> extends FrameLayout implements View.OnCl
      */
     public void setMenuList(List<T> buttonList) {
         this.buttonList = buttonList;
-        if (buttonList == null && buttonList.size() < 1) {
-            return;
-        }
         initView();
-        requestLayout();
+    }
+
+    public void setCentBtnView(View view) {
+        this.centerView = view;
+        initView();
     }
 
     /**
@@ -134,6 +128,10 @@ public class AroundMenu<T extends View> extends FrameLayout implements View.OnCl
      */
     private void initView() {
         removeAllViews();
+
+        if (buttonList == null && buttonList.size() < 1) {
+            return;
+        }
         count = buttonList.size();
 
         //默认添加中间按钮
@@ -146,22 +144,35 @@ public class AroundMenu<T extends View> extends FrameLayout implements View.OnCl
             view.setId(i);
             addView(view);
         }
+
+        requestLayout();
     }
 
     /**
      * 添加中间按钮
      */
     private void addCenterBtn() {
-        MenuButton centerButton = new MenuButton(getContext(), centerBtnSize, centerBtnColor);
-        centerButton.setId(-1);
-        centerButton.setOnClickListener(this);
-        addView(centerButton);
+        if (centerView == null) {
+            centerView = new MenuButton(getContext(), centerBtnSize, centerBtnColor);
+        }
+        centerView.setId(-1);
+        centerView.setOnClickListener(this);
+        addView(centerView);
     }
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         measureChildren(widthMeasureSpec, heightMeasureSpec);
+
+        //控制child大小
+        childWidth = getChildAt(0).getMeasuredWidth();
+        if (childWidth > MenuConfig.MAX_SIZE) {
+            childWidth = MenuConfig.MAX_SIZE;
+        }
+        if (childWidth < MenuConfig.MIN_SIZE) {
+            childWidth = MenuConfig.MIN_SIZE;
+        }
 
         int widthSize, heightSize;
         int widthMode, heightMode;
@@ -180,7 +191,6 @@ public class AroundMenu<T extends View> extends FrameLayout implements View.OnCl
         }
 
         menuWidth = widthSize > heightSize ? heightSize : widthSize;
-
         setMeasuredDimension(menuWidth, menuWidth);
     }
 
@@ -204,7 +214,6 @@ public class AroundMenu<T extends View> extends FrameLayout implements View.OnCl
                 view.layout(rect.left, rect.top, rect.right, rect.bottom);
             }
         }
-        childWidth = getChildAt(0).getMeasuredWidth();
         getChildAt(0).layout(rect.left, rect.top, rect.right, rect.bottom);
     }
 

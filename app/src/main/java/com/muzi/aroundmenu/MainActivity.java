@@ -44,7 +44,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 //                aroundMenu.closeMenu();
-                aroundMenu.setMenuCenterSize(120);
+//                aroundMenu.setMenuCenterSize(120);
+
+                aroundMenu.setCentBtnView(LayoutInflater.from(MainActivity.this).inflate(R.layout.item_btn, null, false));
             }
         });
 

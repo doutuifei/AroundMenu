@@ -7,7 +7,7 @@ import android.graphics.Color;
  * 727784430@qq.com
  */
 
-public class DefalutConfig {
+public class MenuConfig {
 
     public final static int MIN_SIZE = 80;//最小尺寸
 
