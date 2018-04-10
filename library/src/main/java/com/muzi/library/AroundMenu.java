@@ -1,11 +1,11 @@
 package com.muzi.library;
 
 import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 import android.view.animation.OvershootInterpolator;
 import android.widget.FrameLayout;
@@ -99,31 +99,55 @@ public class AroundMenu extends FrameLayout implements View.OnClickListener {
 
     @Override
     public void onClick(View v) {
-        Log.d("AroundMenu", "v.getId():" + v.getId());
-        if (!isShowing) {
-            openMenu();
-        } else {
-            closeMenu();
+        switch (v.getId()) {
+            case -1:
+                //中间按钮
+                if (!isShowing) {
+                    openMenu();
+                } else {
+                    closeMenu();
+                }
+                break;
+            default:
+                if (isShowing) {
+                    closeMenu();
+                }
+                if (onAroundMenuClick != null) {
+                    onAroundMenuClick.onMenuClick(v.getId());
+                }
+                break;
         }
     }
 
-    private void openMenu() {
+    public void openMenu() {
+        if (isShowing) {
+            return;
+        }
         isShowing = true;
         for (int i = 0; i <= count; i++) {
             View view = getChildAt(i + 1);
             openAnimator(view, i, count, radius - childWidth);
         }
+        if (onAroundMenuClick != null) {
+            onAroundMenuClick.onCenterClick(isShowing);
+        }
     }
 
-    private void closeMenu() {
+    public void closeMenu() {
+        if (!isShowing) {
+            return;
+        }
         isShowing = false;
         for (int i = 0; i <= count; i++) {
             View view = getChildAt(i + 1);
             closeAnimator(view, i, count, radius - childWidth);
         }
+        if (onAroundMenuClick != null) {
+            onAroundMenuClick.onCenterClick(isShowing);
+        }
     }
 
-    private void openAnimator(View view, int index, int total, int radius) {
+    private void openAnimator(final View view, int index, int total, int radius) {
         if (view == null) {
             return;
         }
@@ -143,6 +167,13 @@ public class AroundMenu extends FrameLayout implements View.OnClickListener {
                 ObjectAnimator.ofFloat(view, "alpha", 0f, 1));
         set.setInterpolator(new OvershootInterpolator());
         set.setDuration(800).start();
+        set.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+                super.onAnimationStart(animation);
+                view.setVisibility(View.VISIBLE);
+            }
+        });
     }
 
     private void closeAnimator(final View view, int index, int total, int radius) {
@@ -160,30 +191,28 @@ public class AroundMenu extends FrameLayout implements View.OnClickListener {
                 ObjectAnimator.ofFloat(view, "scaleY", 1f, 0.1f),
                 ObjectAnimator.ofFloat(view, "alpha", 1f, 0.1f));
         set.setDuration(800).start();
-        set.addListener(new Animator.AnimatorListener() {
-            @Override
-            public void onAnimationStart(Animator animation) {
-
-            }
-
+        set.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
-                view.setVisibility(GONE);
-            }
-
-            @Override
-            public void onAnimationCancel(Animator animation) {
-
-            }
-
-            @Override
-            public void onAnimationRepeat(Animator animation) {
-
+                super.onAnimationEnd(animation);
+                view.setVisibility(View.GONE);
             }
         });
     }
 
     public boolean isShowing() {
         return isShowing;
+    }
+
+    private OnAroundMenuClick onAroundMenuClick;
+
+    public void setOnAroundMenuClick(OnAroundMenuClick onAroundMenuClick) {
+        this.onAroundMenuClick = onAroundMenuClick;
+    }
+
+    public interface OnAroundMenuClick {
+        void onCenterClick(boolean isShowing);
+
+        void onMenuClick(int position);
     }
 }
