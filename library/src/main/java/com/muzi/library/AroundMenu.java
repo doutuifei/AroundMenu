@@ -22,8 +22,8 @@ public class AroundMenu extends FrameLayout implements View.OnClickListener {
     private List<MenuButton> buttonList;
     private int count;//数量
     private int radius = 500;//半径
-    private int childWidth;
-    private boolean isShowing;
+    private int childWidth;//按钮的宽度
+    private boolean isShowing;//状态
 
     public AroundMenu(Context context) {
         this(context, null);
@@ -31,13 +31,17 @@ public class AroundMenu extends FrameLayout implements View.OnClickListener {
 
     public AroundMenu(Context context, AttributeSet attrs) {
         super(context, attrs);
-        MenuButton centerButton = new MenuButton(getContext());
-        centerButton.setId(-1);
-        centerButton.setOnClickListener(this);
-        addView(centerButton);
+
+        //默认添加中间按钮
+        addCenterBtn();
     }
 
-    public void setButtonList(List<MenuButton> buttonList) {
+    /**
+     * 添加菜单按钮
+     *
+     * @param buttonList
+     */
+    public void setMenuList(List<MenuButton> buttonList) {
         this.buttonList = buttonList;
         if (buttonList == null && buttonList.size() < 1) {
             return;
@@ -46,14 +50,16 @@ public class AroundMenu extends FrameLayout implements View.OnClickListener {
         requestLayout();
     }
 
+    /**
+     * 初始化菜单数量
+     * 添加中间按钮
+     */
     private void initView() {
         removeAllViews();
         count = buttonList.size();
 
-        MenuButton centerButton = new MenuButton(getContext());
-        centerButton.setId(-1);
-        centerButton.setOnClickListener(this);
-        addView(centerButton);
+        //默认添加中间按钮
+        addCenterBtn();
 
         for (int i = 0; i < count; i++) {
             MenuButton menuButton = new MenuButton(getContext());
@@ -65,6 +71,15 @@ public class AroundMenu extends FrameLayout implements View.OnClickListener {
         invalidate();
     }
 
+    /**
+     * 添加中间按钮
+     */
+    private void addCenterBtn() {
+        MenuButton centerButton = new MenuButton(getContext());
+        centerButton.setId(-1);
+        centerButton.setOnClickListener(this);
+        addView(centerButton);
+    }
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
@@ -120,6 +135,7 @@ public class AroundMenu extends FrameLayout implements View.OnClickListener {
                 }
                 break;
             default:
+                //点击menu
                 if (isShowing) {
                     closeMenu();
                 }
@@ -130,6 +146,9 @@ public class AroundMenu extends FrameLayout implements View.OnClickListener {
         }
     }
 
+    /**
+     * 打开menu
+     */
     public void openMenu() {
         if (isShowing) {
             return;
@@ -144,6 +163,9 @@ public class AroundMenu extends FrameLayout implements View.OnClickListener {
         }
     }
 
+    /**
+     * 关闭menu
+     */
     public void closeMenu() {
         if (!isShowing) {
             return;
@@ -158,6 +180,14 @@ public class AroundMenu extends FrameLayout implements View.OnClickListener {
         }
     }
 
+    /**
+     * 开启动画
+     *
+     * @param view
+     * @param index
+     * @param total
+     * @param radius
+     */
     private void openAnimator(final View view, int index, int total, int radius) {
         if (view == null) {
             return;
@@ -187,6 +217,14 @@ public class AroundMenu extends FrameLayout implements View.OnClickListener {
         });
     }
 
+    /**
+     * 关闭动画
+     *
+     * @param view
+     * @param index
+     * @param total
+     * @param radius
+     */
     private void closeAnimator(final View view, int index, int total, int radius) {
         if (view == null) {
             return;
@@ -211,6 +249,11 @@ public class AroundMenu extends FrameLayout implements View.OnClickListener {
         });
     }
 
+    /**
+     * 返回当前状态
+     *
+     * @return
+     */
     public boolean isShowing() {
         return isShowing;
     }
