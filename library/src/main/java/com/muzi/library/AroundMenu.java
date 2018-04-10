@@ -5,6 +5,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Context;
+import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.animation.OvershootInterpolator;
@@ -17,13 +18,14 @@ import java.util.List;
  * 727784430@qq.com
  */
 
-public class AroundMenu extends FrameLayout implements View.OnClickListener {
+public class AroundMenu<T extends View> extends FrameLayout implements View.OnClickListener {
 
-    private List<MenuButton> buttonList;
+    private List<T> buttonList;
     private int count;//数量
     private int radius = 500;//半径
     private int childWidth;//按钮的宽度
     private boolean isShowing;//状态
+    private int menuOrientation;//方向
 
     public AroundMenu(Context context) {
         this(context, null);
@@ -41,7 +43,7 @@ public class AroundMenu extends FrameLayout implements View.OnClickListener {
      *
      * @param buttonList
      */
-    public void setMenuList(List<MenuButton> buttonList) {
+    public void setMenuList(List<T> buttonList) {
         this.buttonList = buttonList;
         if (buttonList == null && buttonList.size() < 1) {
             return;
@@ -62,11 +64,11 @@ public class AroundMenu extends FrameLayout implements View.OnClickListener {
         addCenterBtn();
 
         for (int i = 0; i < count; i++) {
-            MenuButton menuButton = new MenuButton(getContext());
-            menuButton.setVisibility(GONE);
-            menuButton.setOnClickListener(this);
-            menuButton.setId(i);
-            addView(menuButton);
+            View view = buttonList.get(i);
+            view.setVisibility(GONE);
+            view.setOnClickListener(this);
+            view.setId(i);
+            addView(view);
         }
         invalidate();
     }
@@ -108,17 +110,27 @@ public class AroundMenu extends FrameLayout implements View.OnClickListener {
     }
 
 
+    /**
+     * 设置初始位置
+     *
+     * @param changed
+     * @param left
+     * @param top
+     * @param right
+     * @param bottom
+     */
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         super.onLayout(changed, left, top, right, bottom);
+        Rect rect = AroundMenuHelp.calculateLayout(MenuOrientation.RIGHT_BOTTOM, radius, childWidth);
         if (count > 0) {
             for (int i = 1; i <= count; i++) {
                 View view = getChildAt(i);
-                view.layout(radius - childWidth, radius - childWidth, radius, radius);
+                view.layout(rect.left, rect.top, rect.right, rect.bottom);
             }
         }
         childWidth = getChildAt(0).getMeasuredWidth();
-        getChildAt(0).layout(radius - childWidth, radius - childWidth, radius, radius);
+        getChildAt(0).layout(rect.left, rect.top, rect.right, rect.bottom);
     }
 
     @Override
@@ -151,7 +163,7 @@ public class AroundMenu extends FrameLayout implements View.OnClickListener {
      * 打开menu
      */
     public void openMenu() {
-        if (isShowing){
+        if (isShowing) {
             return;
         }
         isShowing = true;
@@ -170,7 +182,7 @@ public class AroundMenu extends FrameLayout implements View.OnClickListener {
      * 关闭menu
      */
     public void closeMenu() {
-        if (!isShowing){
+        if (!isShowing) {
             return;
         }
         isShowing = false;
@@ -194,9 +206,7 @@ public class AroundMenu extends FrameLayout implements View.OnClickListener {
      * @param radius
      */
     private void openAnimator(final View view, int index, int total, int radius) {
-        if (view.getVisibility() == GONE) {
-            view.setVisibility(VISIBLE);
-        }
+        view.setVisibility(View.VISIBLE);
         double degree = Math.toRadians(90) / (total - 1) * index;
         int translationX = -(int) (radius * Math.sin(degree));
         int translationY = -(int) (radius * Math.cos(degree));
@@ -210,13 +220,6 @@ public class AroundMenu extends FrameLayout implements View.OnClickListener {
                 ObjectAnimator.ofFloat(view, "alpha", 0f, 1));
         set.setInterpolator(new OvershootInterpolator());
         set.setDuration(800).start();
-        set.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationStart(Animator animation) {
-                super.onAnimationStart(animation);
-                view.setVisibility(View.VISIBLE);
-            }
-        });
     }
 
     /**
@@ -228,7 +231,7 @@ public class AroundMenu extends FrameLayout implements View.OnClickListener {
      * @param radius
      */
     private void closeAnimator(final View view, int index, int total, int radius) {
-        double degree = Math.PI * index / ((total - 1) * 2);
+        double degree = Math.toRadians(90) / (total - 1) * index;
         int translationX = -(int) (radius * Math.sin(degree));
         int translationY = -(int) (radius * Math.cos(degree));
         AnimatorSet set = new AnimatorSet();
