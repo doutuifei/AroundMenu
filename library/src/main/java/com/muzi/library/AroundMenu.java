@@ -43,9 +43,28 @@ public class AroundMenu<T extends View> extends FrameLayout implements View.OnCl
         addCenterBtn();
     }
 
+    /**
+     * 设置menu的方向
+     *
+     * @param menuOrientation
+     */
     public void setMenuOrientation(@MenuOrientation.Orientation int menuOrientation) {
         this.menuOrientation = menuOrientation;
         requestLayout();
+    }
+
+    /**
+     * 设置中间按钮menu大小
+     *
+     * @param childSize
+     */
+    public void setMenuCenterSize(int childSize) {
+        this.childWidth = childSize;
+        MenuButton menuButton = (MenuButton) getChildAt(0);
+        if (menuButton != null) {
+            menuButton.setSize(childSize);
+            requestLayout();
+        }
     }
 
     /**
@@ -60,6 +79,33 @@ public class AroundMenu<T extends View> extends FrameLayout implements View.OnCl
         }
         initView();
         requestLayout();
+    }
+
+    /**
+     * 返回当前状态
+     *
+     * @return
+     */
+    public boolean isShowing() {
+        return isShowing;
+    }
+
+    /**
+     * 获取当前Orientation
+     *
+     * @return
+     */
+    public int getMenuOrientation() {
+        return menuOrientation;
+    }
+
+    /**
+     * 回调
+     *
+     * @param onAroundMenuClick
+     */
+    public void setMenuClick(OnAroundMenuClick onAroundMenuClick) {
+        this.onAroundMenuClick = onAroundMenuClick;
     }
 
     /**
@@ -257,23 +303,6 @@ public class AroundMenu<T extends View> extends FrameLayout implements View.OnCl
 
     }
 
-    /**
-     * 返回当前状态
-     *
-     * @return
-     */
-    public boolean isShowing() {
-        return isShowing;
-    }
-
-    /**
-     * 回调
-     *
-     * @param onAroundMenuClick
-     */
-    public void setOnAroundMenuClick(OnAroundMenuClick onAroundMenuClick) {
-        this.onAroundMenuClick = onAroundMenuClick;
-    }
 
     private OnAroundMenuClick onAroundMenuClick;
 

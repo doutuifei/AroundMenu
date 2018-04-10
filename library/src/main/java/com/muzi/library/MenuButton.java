@@ -18,12 +18,19 @@ public class MenuButton extends View {
 
     private int radius;//半径
 
-    private int minSize = 80;//最小尺寸
+    public final static int MIN_SIZE = 80;//最小尺寸
+
+    private int size;
 
     private Paint paint;
 
     public MenuButton(Context context) {
+        this(context, MIN_SIZE);
+    }
+
+    public MenuButton(Context context, int size) {
         this(context, null);
+        this.size = size;
     }
 
     public MenuButton(Context context, @Nullable AttributeSet attrs) {
@@ -44,20 +51,25 @@ public class MenuButton extends View {
         widthMode = MeasureSpec.getMode(widthMeasureSpec);
 
         if (widthMode == MeasureSpec.AT_MOST) {
-            widthMeasure = minSize;
+            widthMeasure = size;
         }
 
         heightMeasure = MeasureSpec.getSize(heightMeasureSpec);
         heightMode = MeasureSpec.getMode(heightMeasureSpec);
 
         if (heightMode == MeasureSpec.AT_MOST) {
-            heightMeasure = minSize;
+            heightMeasure = size;
         }
 
         circleSize = widthMeasure > heightMeasure ? heightMeasure : widthMeasure;
 
         radius = circleSize / 2;
         setMeasuredDimension(circleSize, circleSize);
+    }
+
+    public void setSize(int size) {
+        this.size = size;
+        requestLayout();
     }
 
     @Override
