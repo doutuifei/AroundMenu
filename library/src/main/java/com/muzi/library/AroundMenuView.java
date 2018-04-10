@@ -14,11 +14,11 @@ import android.view.View;
  */
 public class AroundMenuView extends View {
 
-    private int widthMeasure, heightMeasure;
+    private int circleSize;
 
     private int radius;//半径
 
-    private int minSize = 130;//最小尺寸
+    private int minSize = 120;//最小尺寸
 
     private Paint paint;
 
@@ -38,6 +38,7 @@ public class AroundMenuView extends View {
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        int widthMeasure, heightMeasure;
         int widthMode, heightMode;
         widthMeasure = MeasureSpec.getSize(widthMeasureSpec);
         widthMode = MeasureSpec.getMode(widthMeasureSpec);
@@ -52,8 +53,11 @@ public class AroundMenuView extends View {
         if (heightMode == MeasureSpec.AT_MOST) {
             heightMeasure = minSize;
         }
-        radius = widthMeasure / 2;
-        setMeasuredDimension(widthMeasure, heightMeasure);
+
+        circleSize = widthMeasure > heightMeasure ? heightMeasure : widthMeasure;
+
+        radius = circleSize / 2;
+        setMeasuredDimension(circleSize, circleSize);
     }
 
     @Override
