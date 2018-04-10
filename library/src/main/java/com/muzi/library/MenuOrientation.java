@@ -12,15 +12,16 @@ import java.lang.annotation.RetentionPolicy;
 
 public class MenuOrientation {
 
-    public static final int CENTENR = 0;
     public static final int TOP = 1;
     public static final int BOTTOM = 2;
-    public static final int LEFT_TOP = 3;
-    public static final int LEFT_BOTTOM = 4;
-    public static final int RIGHT_TOP = 5;
-    public static final int RIGHT_BOTTOM = 6;
+    public static final int LEFT = 3;
+    public static final int RIGHT = 4;
+    public static final int LEFT_TOP = 5;
+    public static final int LEFT_BOTTOM = 6;
+    public static final int RIGHT_TOP = 7;
+    public static final int RIGHT_BOTTOM = 8;
 
-    @IntDef({CENTENR, TOP, BOTTOM, LEFT_TOP, LEFT_BOTTOM, RIGHT_TOP, RIGHT_BOTTOM})
+    @IntDef({TOP, BOTTOM, LEFT, RIGHT, LEFT_TOP, LEFT_BOTTOM, RIGHT_TOP, RIGHT_BOTTOM})
     @Retention(RetentionPolicy.SOURCE)
     public @interface Orientation {
     }

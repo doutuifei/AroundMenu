@@ -1,10 +1,6 @@
 package com.muzi.library;
 
-import android.animation.AnimatorSet;
-import android.animation.ObjectAnimator;
 import android.graphics.Rect;
-import android.view.View;
-import android.view.animation.OvershootInterpolator;
 
 /**
  * Created by muzi on 2018/4/10.
@@ -14,7 +10,7 @@ import android.view.animation.OvershootInterpolator;
 public class AroundMenuHelp {
 
     /**
-     * 计算初始位置
+     * 计算中间按钮初始位置
      *
      * @param orientation-中心按钮的位置
      * @param radius
@@ -25,23 +21,29 @@ public class AroundMenuHelp {
                                        int radius, int childWidth) {
         Rect rect = new Rect();
         switch (orientation) {
-            case MenuOrientation.CENTENR:
+            case MenuOrientation.BOTTOM:
                 rect.left = radius / 2 - childWidth / 2;
-                rect.top = radius / 2 - childWidth / 2;
+                rect.top = radius - childWidth;
                 rect.right = radius / 2 + childWidth / 2;
-                rect.bottom = radius / 2 + childWidth / 2;
+                rect.bottom = radius;
                 break;
             case MenuOrientation.TOP:
                 rect.left = radius / 2 - childWidth / 2;
-                rect.top = radius / 2;
+                rect.top = 0;
                 rect.right = radius / 2 + childWidth / 2;
-                rect.bottom = radius / 2 + childWidth;
+                rect.bottom = childWidth;
                 break;
-            case MenuOrientation.BOTTOM:
-                rect.left = radius / 2 - childWidth / 2;
-                rect.top = radius / 2 - childWidth;
-                rect.right = radius / 2 + childWidth / 2;
-                rect.bottom = radius / 2;
+            case MenuOrientation.LEFT:
+                rect.left = 0;
+                rect.top = radius / 2 - childWidth / 2;
+                rect.right = childWidth;
+                rect.bottom = radius / 2 + childWidth / 2;
+                break;
+            case MenuOrientation.RIGHT:
+                rect.left = radius - childWidth;
+                rect.top = radius / 2 - childWidth / 2;
+                rect.right = radius;
+                rect.bottom = radius / 2 + childWidth / 2;
                 break;
             case MenuOrientation.RIGHT_BOTTOM:
                 rect.left = radius - childWidth;
@@ -71,23 +73,6 @@ public class AroundMenuHelp {
         return rect;
     }
 
-    private void openAnimator(final View view, int index, int total, int radius) {
-        view.setVisibility(View.VISIBLE);
-        double degree = Math.toRadians(90) / (total - 1) * index;
-        int translationX = -(int) (radius * Math.sin(degree));
-        int translationY = -(int) (radius * Math.cos(degree));
-
-        AnimatorSet set = new AnimatorSet();
-        set.playTogether(
-                ObjectAnimator.ofFloat(view, "translationX", 0, translationX),
-                ObjectAnimator.ofFloat(view, "translationY", 0, translationY),
-                ObjectAnimator.ofFloat(view, "scaleX", 0f, 1f),
-                ObjectAnimator.ofFloat(view, "scaleY", 0f, 1f),
-                ObjectAnimator.ofFloat(view, "alpha", 0f, 1));
-        set.setInterpolator(new OvershootInterpolator());
-        set.setDuration(800).start();
-    }
-
     /**
      * 计算位置距离
      *
@@ -96,19 +81,50 @@ public class AroundMenuHelp {
      * @param total
      * @param radius
      */
-    public static void calculateTranslation(@MenuOrientation.Orientation int orientation,
-                                            int index, int total, int radius) {
-        double degree;
+    public static int[] calculateTranslation(@MenuOrientation.Orientation int orientation,
+                                             int index, int total, int radius) {
+        double degree, degree90;
         int[] translation = new int[2];
         switch (orientation) {
-            case MenuOrientation.CENTENR:
-
-                break;
             case MenuOrientation.TOP:
-
+                degree = Math.toRadians(180) / (total - 1) * index;
+                degree90 = Math.toRadians(90) / (total - 1) * index;
+                if (degree < degree90) {
+                    translation[1] = -(int) (radius / 2 * Math.sin(degree));
+                } else {
+                    translation[1] = (int) (radius / 2 * Math.sin(degree));
+                }
+                translation[0] = -(int) (radius / 2 * Math.cos(degree));
                 break;
             case MenuOrientation.BOTTOM:
-
+                degree = Math.toRadians(180) / (total - 1) * index;
+                degree90 = Math.toRadians(90) / (total - 1) * index;
+                if (degree < degree90) {
+                    translation[1] = (int) (radius / 2 * Math.sin(degree));
+                } else {
+                    translation[1] = -(int) (radius / 2 * Math.sin(degree));
+                }
+                translation[0] = -(int) (radius / 2 * Math.cos(degree));
+                break;
+            case MenuOrientation.LEFT:
+                degree = Math.toRadians(180) / (total - 1) * index;
+                degree90 = Math.toRadians(90) / (total - 1) * index;
+                if (degree < degree90) {
+                    translation[0] = -(int) (radius / 2 * Math.sin(degree));
+                } else {
+                    translation[0] = (int) (radius / 2 * Math.sin(degree));
+                }
+                translation[1] = -(int) (radius / 2 * Math.cos(degree));
+                break;
+            case MenuOrientation.RIGHT:
+                degree = Math.toRadians(180) / (total - 1) * index;
+                degree90 = Math.toRadians(90) / (total - 1) * index;
+                if (degree < degree90) {
+                    translation[0] = (int) (radius / 2 * Math.sin(degree));
+                } else {
+                    translation[0] = -(int) (radius / 2 * Math.sin(degree));
+                }
+                translation[1] = -(int) (radius / 2 * Math.cos(degree));
                 break;
             case MenuOrientation.RIGHT_BOTTOM:
                 degree = Math.toRadians(90) / (total - 1) * index;
@@ -116,17 +132,22 @@ public class AroundMenuHelp {
                 translation[1] = -(int) (radius * Math.cos(degree));
                 break;
             case MenuOrientation.RIGHT_TOP:
-
+                degree = (Math.toRadians(90) / (total - 1) * index);
+                translation[0] = -(int) (radius * Math.sin(degree));
+                translation[1] = (int) (radius * Math.cos(degree));
                 break;
             case MenuOrientation.LEFT_BOTTOM:
+                degree = (Math.toRadians(90) / (total - 1) * index);
+                translation[0] = (int) (radius * Math.sin(degree));
+                translation[1] = -(int) (radius * Math.cos(degree));
+                break;
+            case MenuOrientation.LEFT_TOP:
                 degree = Math.toRadians(90) / (total - 1) * index;
                 translation[0] = (int) (radius * Math.sin(degree));
                 translation[1] = (int) (radius * Math.cos(degree));
                 break;
-            case MenuOrientation.LEFT_TOP:
-
-                break;
         }
+        return translation;
     }
 
 }

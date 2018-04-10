@@ -20,12 +20,18 @@ import java.util.List;
 
 public class AroundMenu<T extends View> extends FrameLayout implements View.OnClickListener {
 
-    private List<T> buttonList;
+    private List<T> buttonList;//view
+
     private int count;//数量
+
     private int radius = 500;//半径
+
     private int childWidth;//按钮的宽度
+
     private boolean isShowing;//状态
-    private int menuOrientation;//方向
+
+    private @MenuOrientation.Orientation
+    int menuOrientation = MenuOrientation.RIGHT_BOTTOM;//方向
 
     public AroundMenu(Context context) {
         this(context, null);
@@ -33,9 +39,13 @@ public class AroundMenu<T extends View> extends FrameLayout implements View.OnCl
 
     public AroundMenu(Context context, AttributeSet attrs) {
         super(context, attrs);
-
         //默认添加中间按钮
         addCenterBtn();
+    }
+
+    public void setMenuOrientation(@MenuOrientation.Orientation int menuOrientation) {
+        this.menuOrientation = menuOrientation;
+        requestLayout();
     }
 
     /**
@@ -70,7 +80,6 @@ public class AroundMenu<T extends View> extends FrameLayout implements View.OnCl
             view.setId(i);
             addView(view);
         }
-        invalidate();
     }
 
     /**
@@ -122,7 +131,7 @@ public class AroundMenu<T extends View> extends FrameLayout implements View.OnCl
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         super.onLayout(changed, left, top, right, bottom);
-        Rect rect = AroundMenuHelp.calculateLayout(MenuOrientation.RIGHT_BOTTOM, radius, childWidth);
+        Rect rect = AroundMenuHelp.calculateLayout(menuOrientation, radius, childWidth);
         if (count > 0) {
             for (int i = 1; i <= count; i++) {
                 View view = getChildAt(i);
@@ -207,14 +216,11 @@ public class AroundMenu<T extends View> extends FrameLayout implements View.OnCl
      */
     private void openAnimator(final View view, int index, int total, int radius) {
         view.setVisibility(View.VISIBLE);
-        double degree = Math.toRadians(90) / (total - 1) * index;
-        int translationX = -(int) (radius * Math.sin(degree));
-        int translationY = -(int) (radius * Math.cos(degree));
-
+        int[] translation = AroundMenuHelp.calculateTranslation(menuOrientation, index, total, radius);
         AnimatorSet set = new AnimatorSet();
         set.playTogether(
-                ObjectAnimator.ofFloat(view, "translationX", 0, translationX),
-                ObjectAnimator.ofFloat(view, "translationY", 0, translationY),
+                ObjectAnimator.ofFloat(view, "translationX", 0, translation[0]),
+                ObjectAnimator.ofFloat(view, "translationY", 0, translation[1]),
                 ObjectAnimator.ofFloat(view, "scaleX", 0f, 1f),
                 ObjectAnimator.ofFloat(view, "scaleY", 0f, 1f),
                 ObjectAnimator.ofFloat(view, "alpha", 0f, 1));
@@ -231,13 +237,11 @@ public class AroundMenu<T extends View> extends FrameLayout implements View.OnCl
      * @param radius
      */
     private void closeAnimator(final View view, int index, int total, int radius) {
-        double degree = Math.toRadians(90) / (total - 1) * index;
-        int translationX = -(int) (radius * Math.sin(degree));
-        int translationY = -(int) (radius * Math.cos(degree));
-        AnimatorSet set = new AnimatorSet();
+        int[] translation = AroundMenuHelp.calculateTranslation(menuOrientation, index, total, radius);
+        final AnimatorSet set = new AnimatorSet();
         set.playTogether(
-                ObjectAnimator.ofFloat(view, "translationX", translationX, 0),
-                ObjectAnimator.ofFloat(view, "translationY", translationY, 0),
+                ObjectAnimator.ofFloat(view, "translationX", translation[0], 0),
+                ObjectAnimator.ofFloat(view, "translationY", translation[1], 0),
                 ObjectAnimator.ofFloat(view, "scaleX", 1f, 0.1f),
                 ObjectAnimator.ofFloat(view, "scaleY", 1f, 0.1f),
                 ObjectAnimator.ofFloat(view, "alpha", 1f, 0.1f));
@@ -247,8 +251,10 @@ public class AroundMenu<T extends View> extends FrameLayout implements View.OnCl
             public void onAnimationEnd(Animator animation) {
                 super.onAnimationEnd(animation);
                 view.setVisibility(View.GONE);
+                set.removeAllListeners();
             }
         });
+
     }
 
     /**
@@ -260,11 +266,16 @@ public class AroundMenu<T extends View> extends FrameLayout implements View.OnCl
         return isShowing;
     }
 
-    private OnAroundMenuClick onAroundMenuClick;
-
+    /**
+     * 回调
+     *
+     * @param onAroundMenuClick
+     */
     public void setOnAroundMenuClick(OnAroundMenuClick onAroundMenuClick) {
         this.onAroundMenuClick = onAroundMenuClick;
     }
+
+    private OnAroundMenuClick onAroundMenuClick;
 
     public interface OnAroundMenuClick {
         void onCenterClick(boolean isShowing);

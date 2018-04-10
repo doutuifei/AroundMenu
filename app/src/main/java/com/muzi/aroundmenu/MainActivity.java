@@ -64,6 +64,8 @@ public class MainActivity extends AppCompatActivity {
         list.add(new MenuButton(this));
         list.add(new MenuButton(this));
         list.add(new MenuButton(this));
+        list.add(new MenuButton(this));
+        list.add(new MenuButton(this));
         aroundMenu.setMenuList(list);
     }
 }
