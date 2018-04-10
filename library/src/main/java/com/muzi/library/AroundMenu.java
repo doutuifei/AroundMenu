@@ -5,6 +5,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.view.View;
@@ -24,14 +25,18 @@ public class AroundMenu<T extends View> extends FrameLayout implements View.OnCl
 
     private int count;//数量
 
-    private int radius = 500;//半径
+    private int radius = 400;//半径
 
     private int childWidth;//按钮的宽度
 
     private boolean isShowing;//状态
 
     private @MenuOrientation.Orientation
-    int menuOrientation = MenuOrientation.RIGHT_BOTTOM;//方向
+    int menuOrientation;//方向
+
+    private int centerBtnColor;//中间按钮背景
+
+    private int centerBtnSize;//中间按钮大小
 
     public AroundMenu(Context context) {
         this(context, null);
@@ -39,6 +44,12 @@ public class AroundMenu<T extends View> extends FrameLayout implements View.OnCl
 
     public AroundMenu(Context context, AttributeSet attrs) {
         super(context, attrs);
+        TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.AroundMenu);
+        menuOrientation = typedArray.getInt(R.styleable.AroundMenu_menuOrientation, MenuOrientation.TOP);
+        centerBtnColor = typedArray.getColor(R.styleable.AroundMenu_centerBtnColor, DefalutConfig.DEFAULT_COLOR);
+        centerBtnSize = (int) typedArray.getDimension(R.styleable.AroundMenu_menuSize, DefalutConfig.MIN_SIZE);
+        typedArray.recycle();
+
         //默认添加中间按钮
         addCenterBtn();
     }
@@ -132,6 +143,7 @@ public class AroundMenu<T extends View> extends FrameLayout implements View.OnCl
      * 添加中间按钮
      */
     private void addCenterBtn() {
+//        MenuButton centerButton = new MenuButton(getContext(), centerBtnSize, centerBtnColor);
         MenuButton centerButton = new MenuButton(getContext());
         centerButton.setId(-1);
         centerButton.setOnClickListener(this);

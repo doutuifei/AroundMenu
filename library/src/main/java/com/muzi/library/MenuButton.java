@@ -2,7 +2,6 @@ package com.muzi.library;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
@@ -18,19 +17,21 @@ public class MenuButton extends View {
 
     private int radius;//半径
 
-    public final static int MIN_SIZE = 80;//最小尺寸
 
-    private int size;
+    private int size = DefalutConfig.MIN_SIZE;
+
+    private int color = DefalutConfig.DEFAULT_COLOR;
 
     private Paint paint;
 
     public MenuButton(Context context) {
-        this(context, MIN_SIZE);
+        this(context, DefalutConfig.MIN_SIZE, DefalutConfig.DEFAULT_COLOR);
     }
 
-    public MenuButton(Context context, int size) {
+    public MenuButton(Context context, int size, int color) {
         this(context, null);
         this.size = size;
+        this.color = color;
     }
 
     public MenuButton(Context context, @Nullable AttributeSet attrs) {
@@ -38,7 +39,7 @@ public class MenuButton extends View {
 
         paint = new Paint();
         paint.setAntiAlias(true);
-        paint.setColor(Color.BLUE);
+        paint.setColor(color);
         paint.setStyle(Paint.Style.FILL);
     }
 

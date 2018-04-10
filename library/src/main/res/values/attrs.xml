@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+
+    <attr name="borderRadius" format="dimension" />
+    <attr name="type">
+        <enum name="circle" value="0" />
+        <enum name="round" value="1" />
+    </attr>
+    <declare-styleable name="RoundImageView">
+        <attr name="borderRadius" />
+        <attr name="type" />
+    </declare-styleable>
+
+
+    <attr name="MenuOrientation">
+        <enum name="top" value="1" />
+        <enum name="bottom" value="2" />
+        <enum name="left" value="3" />
+        <enum name="right" value="4" />
+        <enum name="left_top" value="5" />
+        <enum name="left_bottom" value="6" />
+        <enum name="right_top" value="7" />
+        <enum name="right_bottom" value="8" />
+    </attr>
+    <declare-styleable name="AroundMenu">
+        <attr name="menuOrientation" />
+        <attr name="centerBtnColor" format="color" />
+        <attr name="menuSize" format="dimension" />
+    </declare-styleable>
+
+</resources>
