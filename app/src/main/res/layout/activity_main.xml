@@ -23,8 +23,9 @@
         android:id="@+id/menu"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:menuOrientation="bottom"
+        android:background="@color/colorAccent"
         app:centerBtnColor="@color/colorPrimaryDark"
-        android:background="@color/colorAccent"></com.muzi.library.AroundMenu>
+        app:menuBtnSize="40dp"
+        app:menuOrientation="bottom"></com.muzi.library.AroundMenu>
 
 </LinearLayout>
