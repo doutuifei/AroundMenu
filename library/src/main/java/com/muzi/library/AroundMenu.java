@@ -20,7 +20,7 @@ import java.util.List;
 public class AroundMenu extends FrameLayout implements View.OnClickListener {
 
     private List<MenuButton> buttonList;
-    private int count = 5;//数量
+    private int count;//数量
     private int radius = 500;//半径
     private int childWidth;
     private boolean isShowing;
@@ -31,18 +31,10 @@ public class AroundMenu extends FrameLayout implements View.OnClickListener {
 
     public AroundMenu(Context context, AttributeSet attrs) {
         super(context, attrs);
-        MenuButton centerButton = new MenuButton(context);
+        MenuButton centerButton = new MenuButton(getContext());
         centerButton.setId(-1);
         centerButton.setOnClickListener(this);
         addView(centerButton);
-
-        for (int i = 0; i < count; i++) {
-            MenuButton menuButton = new MenuButton(context);
-            menuButton.setVisibility(GONE);
-            menuButton.setOnClickListener(this);
-            menuButton.setId(i);
-            addView(menuButton);
-        }
     }
 
     public void setButtonList(List<MenuButton> buttonList) {
@@ -50,11 +42,26 @@ public class AroundMenu extends FrameLayout implements View.OnClickListener {
         if (buttonList == null && buttonList.size() < 1) {
             return;
         }
+        initView();
+        requestLayout();
+    }
+
+    private void initView() {
+        removeAllViews();
         count = buttonList.size();
-        for (MenuButton menuButton : buttonList) {
+
+        MenuButton centerButton = new MenuButton(getContext());
+        centerButton.setId(-1);
+        centerButton.setOnClickListener(this);
+        addView(centerButton);
+
+        for (int i = 0; i < count; i++) {
+            MenuButton menuButton = new MenuButton(getContext());
+            menuButton.setVisibility(GONE);
+            menuButton.setOnClickListener(this);
+            menuButton.setId(i);
             addView(menuButton);
         }
-
         invalidate();
     }
 
@@ -89,9 +96,11 @@ public class AroundMenu extends FrameLayout implements View.OnClickListener {
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         super.onLayout(changed, left, top, right, bottom);
-        for (int i = 1; i <= count; i++) {
-            View view = getChildAt(i);
-            view.layout(radius - childWidth, radius - childWidth, radius, radius);
+        if (count > 0) {
+            for (int i = 1; i <= count; i++) {
+                View view = getChildAt(i);
+                view.layout(radius - childWidth, radius - childWidth, radius, radius);
+            }
         }
         childWidth = getChildAt(0).getMeasuredWidth();
         getChildAt(0).layout(radius - childWidth, radius - childWidth, radius, radius);
@@ -102,10 +111,12 @@ public class AroundMenu extends FrameLayout implements View.OnClickListener {
         switch (v.getId()) {
             case -1:
                 //中间按钮
-                if (!isShowing) {
-                    openMenu();
-                } else {
-                    closeMenu();
+                if (count > 0) {
+                    if (!isShowing) {
+                        openMenu();
+                    } else {
+                        closeMenu();
+                    }
                 }
                 break;
             default:

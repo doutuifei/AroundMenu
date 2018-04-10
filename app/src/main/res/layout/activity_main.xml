@@ -8,6 +8,12 @@
     tools:context=".MainActivity">
 
     <Button
+        android:id="@+id/btnInit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="初始化" />
+
+    <Button
         android:id="@+id/btnOpen"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
