@@ -126,12 +126,13 @@ public class AroundMenu extends FrameLayout implements View.OnClickListener {
         switch (v.getId()) {
             case -1:
                 //中间按钮
-                if (count > 0) {
-                    if (!isShowing) {
-                        openMenu();
-                    } else {
-                        closeMenu();
-                    }
+                if (count < 1) {
+                    return;
+                }
+                if (!isShowing) {
+                    openMenu();
+                } else {
+                    closeMenu();
                 }
                 break;
             default:
@@ -150,13 +151,15 @@ public class AroundMenu extends FrameLayout implements View.OnClickListener {
      * 打开menu
      */
     public void openMenu() {
-        if (isShowing) {
+        if (isShowing){
             return;
         }
         isShowing = true;
         for (int i = 0; i <= count; i++) {
             View view = getChildAt(i + 1);
-            openAnimator(view, i, count, radius - childWidth);
+            if (view != null) {
+                openAnimator(view, i, count, radius - childWidth);
+            }
         }
         if (onAroundMenuClick != null) {
             onAroundMenuClick.onCenterClick(isShowing);
@@ -167,13 +170,15 @@ public class AroundMenu extends FrameLayout implements View.OnClickListener {
      * 关闭menu
      */
     public void closeMenu() {
-        if (!isShowing) {
+        if (!isShowing){
             return;
         }
         isShowing = false;
         for (int i = 0; i <= count; i++) {
             View view = getChildAt(i + 1);
-            closeAnimator(view, i, count, radius - childWidth);
+            if (view != null) {
+                closeAnimator(view, i, count, radius - childWidth);
+            }
         }
         if (onAroundMenuClick != null) {
             onAroundMenuClick.onCenterClick(isShowing);
@@ -189,9 +194,6 @@ public class AroundMenu extends FrameLayout implements View.OnClickListener {
      * @param radius
      */
     private void openAnimator(final View view, int index, int total, int radius) {
-        if (view == null) {
-            return;
-        }
         if (view.getVisibility() == GONE) {
             view.setVisibility(VISIBLE);
         }
@@ -226,9 +228,6 @@ public class AroundMenu extends FrameLayout implements View.OnClickListener {
      * @param radius
      */
     private void closeAnimator(final View view, int index, int total, int radius) {
-        if (view == null) {
-            return;
-        }
         double degree = Math.PI * index / ((total - 1) * 2);
         int translationX = -(int) (radius * Math.sin(degree));
         int translationY = -(int) (radius * Math.cos(degree));
@@ -269,4 +268,5 @@ public class AroundMenu extends FrameLayout implements View.OnClickListener {
 
         void onMenuClick(int position);
     }
+
 }
