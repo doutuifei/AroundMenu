@@ -44,14 +44,14 @@ public class AroundMenuView extends View {
         widthMode = MeasureSpec.getMode(widthMeasureSpec);
 
         if (widthMode == MeasureSpec.AT_MOST) {
-            widthMeasure = minSize;
+            widthMeasure = com.muzi.library.utils.Display.dp2px(minSize);
         }
 
         heightMeasure = MeasureSpec.getSize(heightMeasureSpec);
         heightMode = MeasureSpec.getMode(heightMeasureSpec);
 
         if (heightMode == MeasureSpec.AT_MOST) {
-            heightMeasure = minSize;
+            heightMeasure = com.muzi.library.utils.Display.dp2px(minSize);
         }
 
         circleSize = widthMeasure > heightMeasure ? heightMeasure : widthMeasure;
