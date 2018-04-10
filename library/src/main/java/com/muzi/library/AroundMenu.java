@@ -1,12 +1,11 @@
 package com.muzi.library;
 
+import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Context;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.OvershootInterpolator;
 import android.widget.FrameLayout;
@@ -22,12 +21,9 @@ public class AroundMenu extends FrameLayout implements View.OnClickListener {
 
     private List<MenuButton> buttonList;
     private int count = 5;//数量
-    private MenuButton centerButton;
     private int radius = 500;//半径
     private int childWidth;
     private boolean isShowing;
-
-    private Paint paint;
 
     public AroundMenu(Context context) {
         this(context, null);
@@ -35,21 +31,18 @@ public class AroundMenu extends FrameLayout implements View.OnClickListener {
 
     public AroundMenu(Context context, AttributeSet attrs) {
         super(context, attrs);
-        centerButton = new MenuButton(context);
+        MenuButton centerButton = new MenuButton(context);
+        centerButton.setId(-1);
         centerButton.setOnClickListener(this);
         addView(centerButton);
 
         for (int i = 0; i < count; i++) {
             MenuButton menuButton = new MenuButton(context);
-            menuButton.setId(i + 1);
+            menuButton.setVisibility(GONE);
+            menuButton.setOnClickListener(this);
+            menuButton.setId(i);
             addView(menuButton);
         }
-
-        paint = new Paint();
-        paint.setAntiAlias(true);
-        paint.setColor(Color.parseColor("#3F51B5"));
-        paint.setStrokeWidth(4);
-        paint.setStyle(Paint.Style.STROKE);
     }
 
     public void setButtonList(List<MenuButton> buttonList) {
@@ -65,11 +58,6 @@ public class AroundMenu extends FrameLayout implements View.OnClickListener {
         invalidate();
     }
 
-    @Override
-    protected void onDraw(Canvas canvas) {
-        super.onDraw(canvas);
-        canvas.drawCircle(radius, radius, radius - childWidth / 2, paint);
-    }
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
@@ -111,24 +99,36 @@ public class AroundMenu extends FrameLayout implements View.OnClickListener {
 
     @Override
     public void onClick(View v) {
+        Log.d("AroundMenu", "v.getId():" + v.getId());
         if (!isShowing) {
-            isShowing = true;
-            for (int i = 0; i <= count; i++) {
-                View view = getChildAt(i + 1);
-                openAnimator(view, i, count, radius - childWidth);
-            }
+            openMenu();
         } else {
-            isShowing = false;
-            for (int i = 0; i <= count; i++) {
-                View view = getChildAt(i + 1);
-                closeAnimator(view, i, count, radius - childWidth);
-            }
+            closeMenu();
+        }
+    }
+
+    private void openMenu() {
+        isShowing = true;
+        for (int i = 0; i <= count; i++) {
+            View view = getChildAt(i + 1);
+            openAnimator(view, i, count, radius - childWidth);
+        }
+    }
+
+    private void closeMenu() {
+        isShowing = false;
+        for (int i = 0; i <= count; i++) {
+            View view = getChildAt(i + 1);
+            closeAnimator(view, i, count, radius - childWidth);
         }
     }
 
     private void openAnimator(View view, int index, int total, int radius) {
         if (view == null) {
             return;
+        }
+        if (view.getVisibility() == GONE) {
+            view.setVisibility(VISIBLE);
         }
         double degree = Math.toRadians(90) / (total - 1) * index;
         int translationX = -(int) (radius * Math.sin(degree));
@@ -145,12 +145,9 @@ public class AroundMenu extends FrameLayout implements View.OnClickListener {
         set.setDuration(800).start();
     }
 
-    private void closeAnimator(View view, int index, int total, int radius) {
+    private void closeAnimator(final View view, int index, int total, int radius) {
         if (view == null) {
             return;
-        }
-        if (view.getVisibility() != View.VISIBLE) {
-            view.setVisibility(View.VISIBLE);
         }
         double degree = Math.PI * index / ((total - 1) * 2);
         int translationX = -(int) (radius * Math.sin(degree));
@@ -163,8 +160,28 @@ public class AroundMenu extends FrameLayout implements View.OnClickListener {
                 ObjectAnimator.ofFloat(view, "scaleY", 1f, 0.1f),
                 ObjectAnimator.ofFloat(view, "alpha", 1f, 0.1f));
         set.setDuration(800).start();
-    }
+        set.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
 
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                view.setVisibility(GONE);
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+
+            }
+        });
+    }
 
     public boolean isShowing() {
         return isShowing;
